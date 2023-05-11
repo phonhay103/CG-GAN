@@ -1,0 +1,24 @@
+python train_handwritten.py \
+--dataroot data/datasets/train_VIE \
+--ttfRoot data/fonts/VIE/arial.ttf \
+--corpusRoot data/texts/VIE_all_chars.txt \
+--dictionaryRoot data/dictionaries/VIE_dictionary.txt \
+--name VIE_handwriting_arial \
+--model handwritten \
+--batch_size 6 \
+--num_threads 8 \
+--num_writer 1 \
+--gpu_ids 2 \
+--lr 0.0001 \
+--lr_decay_iters 30 \
+--niter 15 \
+--niter_decay 30 \
+--gan_mode lsgan \
+--imgH 64 \
+--G_ch 64 \
+--imgW 384 \
+--max_length 96 \
+--D_ch 64 \
+--hidden_size 256 \
+--epoch 7 \
+--continue_train

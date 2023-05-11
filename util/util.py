@@ -2,7 +2,7 @@
 from __future__ import print_function
 import torch
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import os
 
 
@@ -101,3 +101,11 @@ def mkdir(path):
     """
     if not os.path.exists(path):
         os.makedirs(path)
+
+def draw(font_path, label):
+    font = ImageFont.truetype(font_path, 80)
+    label_w, label_h = font.getsize(label)
+    img_target = Image.new('RGB', (label_w, label_h), (255, 255, 255))
+    drawBrush = ImageDraw.Draw(img_target)
+    drawBrush.text((0, 0), label, fill=(0, 0, 0), font=font)
+    return img_target

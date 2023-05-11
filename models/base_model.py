@@ -172,7 +172,7 @@ class BaseModel(ABC):
     def get_total_right(self):
         """Return traning losses / errors. train.py will print out these errors on console, and save them to a file"""
         total_right_ret = OrderedDict()
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         for name in self.num_right_names:
             if isinstance(name, str):
                 total_right_ret[name] = float(getattr(self, name))  # float(...) works for both scalar tensor and float number

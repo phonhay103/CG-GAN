@@ -5,43 +5,43 @@ from .base_model import BaseModel
 from . import networks,unet
 
 def lexicontoid(length,writerid):
-    #import pdb;pdb.set_trace()
     lexicon_writerID = torch.LongTensor(length.sum().item()).fill_(0)
     start = 0
     for i,len in enumerate(length):
         lexicon_writerID[start:start+len] = writerid[i].expand(len)
         start = start + len
-    #import pdb;pdb.set_trace()
     return lexicon_writerID
 
 class HANDWRITTENModel(BaseModel):
 
     @staticmethod
     def modify_commandline_options(parser, is_train=True):
-        #import pdb;pdb.set_trace()
-        parser.set_defaults(no_dropout=True)  # default CycleGAN did not use dropout
+        # parser.set_defaults(no_dropout=True) # no_dropout not used
         if is_train:
             parser.add_argument('--lambda_loc', type=float, default=0.1, help='weight for local D')            
             parser.add_argument('--lambda_Lcontent', type=float, default=10.0, help='weight for Loss_G_content')            
-        return parser    
-        
+        return parser
+
     def __init__(self, opt):
 
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = ['D', 'D_lexicon','D_ID' ,'D_radical_ID','unetD_real','unetD_middle_real','D_real_lexicon_feat','unetD_fake','unetD_middle_fake','D_fake_lexicon_feat',
-                            'G', 'G_lexicon','G_ID','G_radical_ID','unetG','unetG_middle','G_lexicon_feat','G_idt','G_cont_idt']
-        
+        self.loss_names = ['D', 'D_lexicon', 'D_ID', 'D_radical_ID', 'unetD_middle_real', 'D_real_lexicon_feat', 'unetD_middle_fake',
+                           'D_fake_lexicon_feat', 'G', 'G_lexicon', 'G_ID', 'G_radical_ID', 'unetG_middle', 'G_lexicon_feat', 'G_idt', 'G_cont_idt']
+
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
-        visual_names_A = ['img_print', ]
-        visual_names_B = ['img_print2write','img_write']
-        self.visual_names = visual_names_A + visual_names_B
+        if self.isTrain:
+            self.visual_names = ['img_print', 'img_print2write', 'img_write']
+            # self.visual_names = ['img_print', 'img_print2write']
+        else:
+            self.visual_names = ['img_print', 'img_print2write']
+
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
         if self.isTrain:
             self.model_names = ['StyleEncoder', 'ContentEncoder', 'decoder', 'D']
-        else:  
-            self.model_names = ['StyleEncoder', 'ContentEncoder', 'decoder']            
-       
+        else:
+            self.model_names = ['StyleEncoder', 'ContentEncoder', 'decoder']
+
         self.netContentEncoder = unet.content_encoder(G_ch=opt.G_ch).cuda()
         self.netStyleEncoder = unet.style_encoder_textedit_addskip(G_ch=64).cuda()
         self.netdecoder = unet.decoder_textedit_addskip(G_ch=opt.G_ch,nEmbedding=1024).cuda()
@@ -50,14 +50,9 @@ class HANDWRITTENModel(BaseModel):
             
             self.radical_path = opt.dictionaryRoot
             alphabet_radical = open(self.radical_path).read().splitlines()
-            # alphabet
-            if opt.alphabet[-4:] == '.txt':
-                alphabet_char = open(opt.alphabet, 'r').read().splitlines()
-            alphabet_char = ''.join(alphabet_char)            
-            
-            self.netD = networks.define_D(len(alphabet_char)+1, opt.input_nc,opt.hidden_size,len(alphabet_radical)+3,opt.dropout_p,opt.max_length,opt.D_ch,
-                                            opt.num_writer,opt.norm, opt.init_type, opt.init_gain, self.gpu_ids,iam = True)
-            
+            self.netD = networks.define_D(len(alphabet_radical)+1, opt.input_nc, opt.hidden_size, len(alphabet_radical)+3, opt.dropout_p, opt.max_length, opt.D_ch,
+                                          opt.num_writer, opt.norm, opt.init_type, opt.init_gain, self.gpu_ids)
+
             self.converter = AttnLabelConverter_IAM(alphabet_radical)
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
             # self.criterionunetD =networks.unetDisLoss().to(self.device) 
@@ -66,15 +61,14 @@ class HANDWRITTENModel(BaseModel):
             self.criterionCls = torch.nn.CrossEntropyLoss()
 
             # initialize optimizers; schedulers will be automatically created by function <BaseModel.setup>.
-            self.optimizer_G = torch.optim.Adam(itertools.chain(self.netContentEncoder.parameters(), 
+            self.optimizer_G = torch.optim.Adam(itertools.chain(self.netContentEncoder.parameters(),
                 self.netStyleEncoder.parameters(),self.netdecoder.parameters()), lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.Adam(self.netD.parameters(), 
                 lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizers.append(self.optimizer_G)
             self.optimizers.append(self.optimizer_D)
 
-    def set_input(self, input): 
-        #import pdb;pdb.set_trace()
+    def set_input(self, input):
         self.img_write = input['A'].to(self.device)
         self.img_print = input['B'].to(self.device)
         self.image_paths = input['B_label']
@@ -94,7 +88,7 @@ class HANDWRITTENModel(BaseModel):
             self.lexicon_A_writerID = lexicontoid(self.new_lexicon_A_length,self.writerID).cuda()
             self.lexicon_B_writerID = lexicontoid(self.new_lexicon_B_length,self.writerID).cuda()
             self.new_lexicon_A = self.new_lexicon_A.cuda()
-            self.new_lexicon_B = self.new_lexicon_B.cuda() 
+            self.new_lexicon_B = self.new_lexicon_B.cuda()
             self.writerID = self.writerID.cuda()
 
     def set_single_input(self,input):
@@ -105,26 +99,23 @@ class HANDWRITTENModel(BaseModel):
 
     def forward(self):
 
-        """Run forward pass; called by both functions <optimize_parameters> and <test>."""        
+        """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         self.style_emd,self.style_fc,self.residual_features_style = self.netStyleEncoder(self.img_write)
         self.cont,self.residual_features = self.netContentEncoder(self.img_print)
         self.img_print2write = self.netdecoder(self.cont,self.residual_features,self.style_emd,self.style_fc,self.residual_features_style)     
-        
-    def backward_D_basic(self, netD, real, fake):
 
-        lambda_loc = self.opt.lambda_loc        
-        # Real        
+    def backward_D_basic(self, netD, real, fake):
+        # Real
         pred_radical_real,real_loss,out_real, writerID_real, radical_writerID_real =netD(real,self.new_lexicon_A,self.new_lexicon_A_length)
-        # import pdb;pdb.set_trace()
         # self.loss_unetD_real,self.loss_unetD_middle_real = self.criterionunetD(out_real,bottleneck_out_real,True)
         self.loss_unetD_middle_real = self.criterionD(out_real,True)
-        loss_D_real_lexicon = real_loss 
+        loss_D_real_lexicon = real_loss
         self.loss_D_real_lexicon_feat = self.criterionGAN(pred_radical_real,True)
         # loss_D_real = self.loss_unetD_real * lambda_loc + self.loss_unetD_middle_real + self.loss_D_real_lexicon_feat     
-        loss_D_real = self.loss_unetD_middle_real + self.loss_D_real_lexicon_feat   
+        loss_D_real = self.loss_unetD_middle_real + self.loss_D_real_lexicon_feat
         loss_D_ID = self.criterionCls(writerID_real, self.writerID)
         loss_D_radical_ID = self.criterionCls(radical_writerID_real, self.lexicon_A_writerID)
-        # Fake        
+        # Fake
         pred_radical_fake,fake_loss,out_fake, _, _= netD(fake.detach(), self.new_lexicon_B,self.new_lexicon_B_length)
         # self.loss_unetD_fake,self.loss_unetD_middle_fake = self.criterionunetD(out_fake,bottleneck_out_fake,False)
         self.loss_unetD_middle_fake = self.criterionD(out_fake,False)
@@ -143,10 +134,8 @@ class HANDWRITTENModel(BaseModel):
         
 
     def backward_G(self):
-        lambda_loc = self.opt.lambda_loc
         lambda_content = self.opt.lambda_Lcontent
         pred_radical, loss, out, writerID, radical_wrtiterID = self.netD(self.img_print2write, self.new_lexicon_B,self.new_lexicon_B_length)
-        import pdb;pdb.set_trace()
         #loss_G
         # self.loss_unetG, self.loss_unetG_middle = self.criterionunetD(out, bottleneck_out, True)
         self.loss_unetG_middle = self.criterionD(out, True)
