@@ -164,3 +164,4 @@ checkpoints/*
 results/*
 readme.txt
 *.pyc
+CGGANv2.2/

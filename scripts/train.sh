@@ -6,7 +6,7 @@ python train_handwritten.py \
 --name VIE_handwriting_arial \
 --model handwritten \
 --batch_size 6 \
---num_threads 8 \
+--num_threads 10 \
 --num_writer 1 \
 --gpu_ids 2 \
 --lr 0.0001 \
@@ -20,5 +20,5 @@ python train_handwritten.py \
 --max_length 96 \
 --D_ch 64 \
 --hidden_size 256 \
---epoch 7 \
+--epoch 25 \
 --continue_train

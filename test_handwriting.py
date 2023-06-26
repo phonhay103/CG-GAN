@@ -56,7 +56,8 @@ def draw(font_path, label) -> Image:
 opt = TestOptions().parse()
 transform_img = ResizeKeepRatio((opt.imgW, opt.imgH))
 
-save_dir = os.path.join(opt.results_dir, opt.name, datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
+timeNow = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+save_dir = os.path.join(opt.results_dir, opt.name, timeNow)
 Path(save_dir).mkdir(parents=True, exist_ok=True)
 
 with open(opt.corpusRoot) as f:
@@ -65,7 +66,7 @@ with open(opt.corpusRoot) as f:
 model = create_model(opt)
 
 threshold = 250
-for i in [11, 12, 13, 14, 15]:
+for i in range(10, 46):
     try:
         opt.epoch = i
         model.setup(opt)
@@ -94,4 +95,5 @@ for i in [11, 12, 13, 14, 15]:
             continue
 
         random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-        img.save(os.path.join(save_dir, f"{word}_{random_chars}_epoch_{i}.png"))
+        filename = f"{word}_{random_chars}_epoch_{i}.png"
+        img.save(os.path.join(save_dir, filename))

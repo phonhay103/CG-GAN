@@ -40,7 +40,8 @@ model.setup(opt)
 # create a visualizer that display/save images and plots
 visualizer = Visualizer(opt)
 total_iters = 0                # the total number of training iterations
-
+if opt.continue_train:
+    opt.epoch_count = int(opt.epoch) + 1
 # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
 for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
     epoch_start_time = time.time()  # timer for entire epoch

@@ -86,11 +86,11 @@ def createDataset(outputPath, imagePathList, labelList, writerIDList, lexiconLis
     writeCache(env, cache)
     print('Created dataset with %d samples' % nSamples)
 
-PATH = '/mnt/disk1/naver/nl/BSRGAN/testsets/full_img'
-# LABEL_PATH = '/mnt/disk1/naver/nl/vietocr/datasets/labels/train.txt'
+PATH = '/mnt/disk1/naver/nl/vietocr/datasets/images/full_img'
+LABEL_PATH = '/mnt/disk1/naver/nl/vietocr/datasets/labels/train.txt'
 # LABEL_PATH = '/mnt/disk1/naver/nl/vietocr/datasets/labels/valid.txt'
 # LABEL_PATH = '/mnt/disk1/naver/nl/vietocr/datasets/labels/test.txt'
-# OUTPUT_PATH = 'data/datasets/train_VIE'
+OUTPUT_PATH = 'data/datasets/train_VIE'
 # OUTPUT_PATH = 'data/datasets/valid_VIE'
 # OUTPUT_PATH = 'data/datasets/test_VIE'
 
