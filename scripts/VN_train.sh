@@ -6,9 +6,9 @@ python VN_train.py \
 --name VN_handwriting_arial \
 --model handwritten \
 --batch_size 6 \
---num_threads 10 \
+--num_threads 12 \
 --num_writer 1 \
---gpu_ids 2 \
+--gpu_ids 3 \
 --lr 0.0001 \
 --lr_decay_iters 30 \
 --niter 15 \
@@ -18,6 +18,6 @@ python VN_train.py \
 --imgW 384 \
 --max_length 96 \
 --D_ch 64 \
---hidden_size 256 \
---epoch 25 \
---continue_train
+--hidden_size 256
+# --epoch 45 \
+# --continue_train

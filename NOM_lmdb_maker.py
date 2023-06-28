@@ -10,7 +10,7 @@ import json
 def checkImageIsValid(imageBin):
     if imageBin is None:
         return False
-
+    
     try:
         imageBuf = np.frombuffer(imageBin, dtype=np.uint8)
         img = cv2.imdecode(imageBuf, cv2.IMREAD_COLOR)
@@ -43,7 +43,7 @@ def createDataset(outputPath, imagePathList, labelList, writerIDList, lexiconLis
     """
     assert(len(imagePathList) == len(labelList))
     nSamples = len(imagePathList)
-
+    
     env = lmdb.open(outputPath, map_size=1099511627776)
     cache = {}
     cnt = 1
@@ -88,11 +88,11 @@ LABEL_PATH = 'all_images.txt'
 OUTPUT_PATH = 'data/datasets/NOM_train'
 
 if __name__ == '__main__':
-    dictionary_dir = 'data/dictionaries/NOM_dictionary.txt'
+    dictionary_dir = 'data/dictionaries/NOM_IDS_dictionary.txt'
     with open(dictionary_dir) as f:
         radical_data = f.read().splitlines()
 
-    with open('unicode_to_nom_dict.json') as f:
+    with open('data/dictionaries/unicode_to_nom_dict.json') as f:
         unicode_to_json_dict = json.load(f)
     
     nom_to_radical_dict = dict()
@@ -112,8 +112,8 @@ if __name__ == '__main__':
         img_path, label = img_path.split('\t')
         if label == 'Nom-Script':
             continue
-        label = unicode_to_json_dict[label]
-        lexicon = nom_to_radical_dict[label]
+
+        lexicon = nom_to_radical_dict[unicode_to_json_dict[label]]
 
         lexicon_list.append(lexicon)
         img_path_list.append(f'{PATH}/{img_path}')

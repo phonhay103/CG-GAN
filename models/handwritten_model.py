@@ -43,7 +43,7 @@ class HANDWRITTENModel(BaseModel):
             self.model_names = ['StyleEncoder', 'ContentEncoder', 'decoder']
 
         self.netContentEncoder = unet.content_encoder(G_ch=opt.G_ch).cuda()
-        self.netStyleEncoder = unet.style_encoder_textedit_addskip(G_ch=64).cuda()
+        self.netStyleEncoder = unet.style_encoder_textedit_addskip(G_ch=opt.G_ch).cuda()
         self.netdecoder = unet.decoder_textedit_addskip(G_ch=opt.G_ch,nEmbedding=1024).cuda()
 
         if self.isTrain:  # define discriminators
