@@ -2,9 +2,9 @@ from torch.utils.data import Dataset
 import os
 from PIL import Image, ImageDraw, ImageFont
 try:
-    from lmdb_dataset_iam import resizeKeepRatio
+    from data.VN_lmdb_dataset import resizeKeepRatio
 except:
-    from data.lmdb_dataset_iam import resizeKeepRatio
+    from data.VN_lmdb_dataset import resizeKeepRatio
 
 
 def make_dataset(dir):

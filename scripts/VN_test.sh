@@ -1,0 +1,11 @@
+python VN_test.py \
+--dataroot data/datasets/VN_train \
+--ttfRoot data/fonts/VN/arial.ttf \
+--corpusRoot data/texts/CGGANv2.2.txt \
+--name VIE_handwriting_arial \
+--model handwritten \
+--imgH 64 \
+--imgW 384 \
+--G_ch 64 \
+--gpu_ids 1 \
+--num_threads 20
