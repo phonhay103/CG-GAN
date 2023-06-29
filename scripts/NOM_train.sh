@@ -5,8 +5,8 @@ python NOM_train.py \
 --dictionaryRoot data/dictionaries/NOM_dictionary.txt \
 --name NOM_handwriting \
 --model character \
---batch_size 16 \
---num_threads 10 \
+--batch_size 6 \
+--num_threads 12 \
 --num_writer 1 \
 --gpu_ids 2 \
 --lr 0.0001 \

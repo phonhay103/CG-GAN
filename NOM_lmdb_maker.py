@@ -87,7 +87,7 @@ PATH = 'all_images'
 LABEL_PATH = 'all_images.txt'
 OUTPUT_PATH = 'data/datasets/NOM_train'
 
-if __name__ == '__main__':
+name__ == '__main__':
     dictionary_dir = 'data/dictionaries/NOM_IDS_dictionary.txt'
     with open(dictionary_dir) as f:
         radical_data = f.read().splitlines()

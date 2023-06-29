@@ -20,7 +20,6 @@ train_loader = torch.utils.data.DataLoader(
     shuffle=True, sampler=None, drop_last=True,
     num_workers=int(opt.num_threads))
 dataset_size = len(train_ds)    # get the number of images in the dataset.
-threshold = 250
 print('The number of training images = %d' % dataset_size)
 
 # create a model given opt.model and other options

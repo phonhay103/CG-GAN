@@ -14,12 +14,17 @@ class ConcatLmdbDataset(Dataset):
         assert len(dataset_list) == len(batchsize_list)
 
         self.corpus = open(corpusRoot, "r").read().splitlines()
+        radical_dict = dict()
+        total = open('data/dictionaries/NOM_IDS_dictionary.txt','r').read().splitlines()
+        for line in total:
+            char,radical = line.split(':')[0],line.split(':')[1]
+            radical_dict[char] = radical
         self.datasets = []
         self.prob = [batchsize / sum(batchsize_list)
                      for batchsize in batchsize_list]
         for i in range(len(dataset_list)):
             self.datasets.append(lmdbDataset(
-                dataset_list[i], font_path, self.corpus, transform_img, transform_target_img))
+                dataset_list[i], font_path, self.corpus, transform_img, transform_target_img, radical_dict))
         self.datasets_range = range(len(self.datasets))
 
     def __len__(self):
@@ -67,9 +72,6 @@ class lmdbDataset(Dataset):
         with self.env.begin(write=False) as txn:
             label_key = 'label-%09d' % index
             label = str(txn.get(label_key.encode()).decode('utf-8'))
-            if label == '##':
-                print("##")
-                return self[index + 1]
 
             lexicon_Key = 'lexicon-%09d' % index
             lexicon = str(txn.get(lexicon_Key.encode()).decode('utf-8'))
@@ -96,7 +98,7 @@ class lmdbDataset(Dataset):
             writerID = int(txn.get(writerID_key.encode()))
 
             font = ImageFont.truetype(self.font_path, 80)
-            label_target = self.corpus[random.randint(0, len(self.corpus)-1)]
+            label_target = self.corpus[random.randint(0, len(self.corpus)-1)]                        
             lexicon_target = self.radical_dict[label_target]
             lexicon_target_list_old = lexicon_target.split()
             lexicon_target_list = []
@@ -118,15 +120,15 @@ class lmdbDataset(Dataset):
                 return self[index + 1]
 
             return {
-                'A': img,
-                'B': img_target,
-                'A_paths': (index-1) % len(self.corpus),
-                'writerID': writerID,
-                'A_label': label,
-                'B_label': label_target,
-                'root': self.root,
-                'A_lexicon': lexicon,
-                'B_lexicon':lexicon_target,
+                'A': img, # tensor
+                'B': img_target, # tensor
+                'A_paths': (index-1) % len(self.corpus), # int
+                'writerID': writerID, # 0
+                'A_label': label, # "罣"
+                'B_label': label_target, # "罣"
+                'root': self.root, 
+                'A_lexicon': lexicon, # "罒 土 土"
+                'B_lexicon':lexicon_target, # "罒 土 土"
             }        
 
 

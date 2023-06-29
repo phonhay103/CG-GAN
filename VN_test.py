@@ -52,49 +52,53 @@ def draw(font_path, label) -> Image:
     drawBrush.text((0, 0), label, fill=(0, 0, 0), font=font)
     return img_content
 
+def main():
+    opt = TestOptions().parse()
+    transform_img = ResizeKeepRatio((opt.imgW, opt.imgH))
 
-opt = TestOptions().parse()
-transform_img = ResizeKeepRatio((opt.imgW, opt.imgH))
+    timeNow = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    save_dir = os.path.join(opt.results_dir, opt.name, timeNow)
+    Path(save_dir).mkdir(parents=True, exist_ok=True)
 
-timeNow = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-save_dir = os.path.join(opt.results_dir, opt.name, timeNow)
-Path(save_dir).mkdir(parents=True, exist_ok=True)
+    with open(opt.corpusRoot) as f:
+        corpus = f.read().splitlines()
 
-with open(opt.corpusRoot) as f:
-    corpus = f.read().splitlines()
+    model = create_model(opt)
 
-model = create_model(opt)
-
-threshold = 250
-for i in range(10, 46):
-    try:
-        opt.epoch = i
-        model.setup(opt)
-        model.eval()
-    except:
-        print(f'model {i} is invalid')
-        continue
-
-    for word in tqdm(corpus):
-        img_content = draw(opt.ttfRoot, word)
-        # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
-        img_content = transform_img(img_content)
-        img_content = img_content.unsqueeze(0)
-        data = {'A': img_content, 'B': img_content}
-        model.set_single_input(data)
-        model.test()
-        visuals = model.get_current_visuals()
-        img = list(visuals.items())[0][1]
-        img = util.tensor2im(img)
-
+    threshold = 250
+    # for i in range(10, 46):
+    for i in range(10, 11):
         try:
-            first_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][0] + 1
-            last_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][-1] + 1
-            img = img[:, first_idx:last_idx, :]
-            img = Image.fromarray(img)
+            opt.epoch = i
+            model.setup(opt)
+            model.eval()
         except:
+            print(f'model {i} is invalid')
             continue
 
-        random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-        filename = f"{word}_{random_chars}_epoch_{i}.png"
-        img.save(os.path.join(save_dir, filename))
+        for word in tqdm(corpus):
+            img_content = draw(opt.ttfRoot, word)
+            # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
+            img_content = transform_img(img_content)
+            img_content = img_content.unsqueeze(0)
+            data = {'A': img_content, 'B': img_content}
+            model.set_single_input(data)
+            model.test()
+            visuals = model.get_current_visuals()
+            img = list(visuals.items())[0][1]
+            img = util.tensor2im(img)
+
+            try:
+                first_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][0] + 1
+                last_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][-1] + 1
+                img = img[:, first_idx:last_idx, :]
+                img = Image.fromarray(img)
+            except:
+                continue
+
+            random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
+            filename = f"{word}_{random_chars}_epoch_{i}.png"
+            img.save(os.path.join(save_dir, filename))
+
+if __name__ == '__main__':
+    main()
