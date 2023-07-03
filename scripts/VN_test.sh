@@ -7,5 +7,5 @@ python VN_test.py \
 --imgH 64 \
 --imgW 384 \
 --G_ch 64 \
---gpu_ids 1 \
+--gpu_ids 3 \
 --num_threads 20

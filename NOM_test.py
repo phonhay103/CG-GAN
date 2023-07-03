@@ -66,7 +66,8 @@ def main():
     model = create_model(opt)
 
     threshold = 250
-    for i in range(10, 46):
+    # for i in range(10, 46):
+    for i in range(10, 11):
         try:
             opt.epoch = i
             model.setup(opt)
