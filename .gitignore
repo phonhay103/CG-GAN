@@ -162,6 +162,4 @@ cython_debug/
 data/datasets/*
 checkpoints/*
 results/*
-readme.txt
-*.pyc
 all_images/
