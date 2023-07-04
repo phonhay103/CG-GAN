@@ -1,0 +1,11 @@
+python NOM_test.py \
+--dataroot data/datasets/NOM_train \
+--ttfRoot data/fonts/NOM/NomNaTong-Regular.ttf \
+--corpusRoot data/texts/NOM_all_chars.txt \
+--name NOM_handwriting \
+--model character \
+--imgH 128 \
+--imgW 128 \
+--G_ch 64 \
+--gpu_ids 1 \
+--num_threads 20

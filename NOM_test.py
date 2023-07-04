@@ -65,9 +65,8 @@ def main():
 
     model = create_model(opt)
 
-    threshold = 250
-    # for i in range(10, 46):
-    for i in range(10, 11):
+    for i in range(1, 46):
+    # for i in range(4, 10):
         try:
             opt.epoch = i
             model.setup(opt)
@@ -87,17 +86,10 @@ def main():
             visuals = model.get_current_visuals()
             img = list(visuals.items())[0][1]
             img = util.tensor2im(img)
-
-            try:
-                first_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][0] + 1
-                last_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][-1] + 1
-                img = img[:, first_idx:last_idx, :]
-                img = Image.fromarray(img)
-            except:
-                continue
+            img = Image.fromarray(img)
 
             random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-            filename = f"{word}_{random_chars}_epoch_{i}.png"
+            filename = f"epoch_{i}_{word}_{random_chars}.png"
             img.save(os.path.join(save_dir, filename))
 
 if __name__ == '__main__':

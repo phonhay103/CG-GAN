@@ -96,7 +96,7 @@ def main():
                 continue
 
             random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-            filename = f"{word}_{random_chars}_epoch_{i}.png"
+            filename = f"epoch_{i}_{word}_{random_chars}.png"
             img.save(os.path.join(save_dir, filename))
 
 if __name__ == '__main__':

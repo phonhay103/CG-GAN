@@ -162,4 +162,3 @@ cython_debug/
 data/datasets/*
 checkpoints/*
 results/*
-all_images/
