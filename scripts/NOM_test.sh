@@ -7,5 +7,5 @@ python NOM_test.py \
 --imgH 128 \
 --imgW 128 \
 --G_ch 64 \
---gpu_ids 1 \
+--gpu_ids 2 \
 --num_threads 20

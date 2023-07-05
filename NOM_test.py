@@ -3,13 +3,13 @@ from options.test_options import TestOptions
 from models import create_model
 from PIL import Image, ImageDraw, ImageFont
 from util import util
-import numpy as np
 import torchvision.transforms as transforms
 from pathlib import Path
 from datetime import datetime
 from tqdm import tqdm
 import random
 import string
+import json
 
 
 class ResizeKeepRatio(object):
@@ -62,6 +62,9 @@ def main():
 
     with open(opt.corpusRoot) as f:
         corpus = f.read().splitlines()
+    
+    with open('NomScript/nom_to_unicode_dict.json') as f:
+        nom_to_unicode_dict = json.load(f)
 
     model = create_model(opt)
 
@@ -77,6 +80,7 @@ def main():
 
         for word in tqdm(corpus):
             img_content = draw(opt.ttfRoot, word)
+            unicode_word = nom_to_unicode_dict[word]
             # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
             img_content = transform_img(img_content)
             img_content = img_content.unsqueeze(0)
@@ -89,7 +93,7 @@ def main():
             img = Image.fromarray(img)
 
             random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-            filename = f"epoch_{i}_{word}_{random_chars}.png"
+            filename = f"epoch_{i}_{word}_{unicode_word}_{random_chars}.png"
             img.save(os.path.join(save_dir, filename))
 
 if __name__ == '__main__':
