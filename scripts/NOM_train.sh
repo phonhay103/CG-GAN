@@ -10,12 +10,10 @@ python NOM_train.py \
 --num_writer 1 \
 --gpu_ids 2 \
 --lr 0.0001 \
---lr_decay_iters 30 \
 --niter 15 \
 --niter_decay 30 \
 --imgH 128 \
 --G_ch 64 \
 --imgW 128 \
 --max_length 64 \
---D_ch 16 \
---hidden_size 256
+--D_ch 16

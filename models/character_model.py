@@ -41,24 +41,30 @@ class CHARACTERModel(BaseModel):
         else:  # during test time, only load Gs
             self.model_names = ['StyleEncoder', 'ContentEncoder', 'decoder']
         
-        # define networks
+        # define Generator
         self.netContentEncoder = unet.content_encoder(G_ch=opt.G_ch).cuda()
         self.netStyleEncoder = unet.style_encoder_textedit_addskip(G_ch = opt.G_ch).cuda()
         self.netdecoder = unet.decoder_textedit_addskip(G_ch = opt.G_ch, nEmbedding=1024).cuda()
         
-        if self.isTrain:  # define discriminators
+        if self.isTrain:
                        
             self.radical_path = opt.dictionaryRoot
             alphabet_radical = open(self.radical_path).read().splitlines()
 
+            # define Discriminator
             self.netD = networks.define_D(len(alphabet_radical)+1, opt.input_nc,opt.hidden_size,len(alphabet_radical)+2,opt.dropout_p,opt.max_length, opt.D_ch,
                                             opt.num_writer, opt.norm, opt.init_type, opt.init_gain, self.gpu_ids,iam = False)
-            self.converter = AttnLabelConverter(alphabet_radical)
-            self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
-            self.criterionD =networks.DisLoss().to(self.device)
-            self.criterionIdt = torch.nn.L1Loss()
-            self.criterionCls = torch.nn.CrossEntropyLoss()
             
+            # define converter: convert between label-text (str) <-> label-index (int)
+            self.converter = AttnLabelConverter(alphabet_radical)
+
+            # define loss functions
+            self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device) # GAN loss function
+            self.criterionD = networks.DisLoss().to(self.device) # D loss function
+            self.criterionIdt = torch.nn.L1Loss() # Identity loss function
+            self.criterionCls = torch.nn.CrossEntropyLoss() # Style loss function
+            
+            # define optimizers
             self.optimizer_G = torch.optim.Adam(itertools.chain(self.netContentEncoder.parameters(), 
                 self.netStyleEncoder.parameters(),self.netdecoder.parameters()), lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.Adam(self.netD.parameters(), 
