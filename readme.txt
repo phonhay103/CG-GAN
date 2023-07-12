@@ -5,6 +5,14 @@
     - LABEL_PATH: path to all labels file .txt
     - OUTPUT_PATH: path to store lmdb dataset
 
+# Metrics
+
+python -m pytorch_fid ../VALID valid_stats --device cuda:2 --batch-size 100 --num-workers 20 --save-stats
+python -m pytorch_fid ../TEST test_stats --device cuda:2 --batch-size 100 --num-workers 20 --save-stats
+
+python -m pytorch_fid full_img_stats.npz ../GAN/GAN_47_F --device cuda:2 --batch-size 100 --num-workers 20
+
+
 * NOM_IDS_dictionary.txt
     https://hvdic.thivien.net/whv/%E7%B9%A3
     https://ctext.org/dictionary.pl?if=en&char=%E7%B3%B8
@@ -29,11 +37,12 @@ corpusRoot => The path to the file containing the words, used to generate the in
 - The optimal value depends on the hardware and model.
 
 * lr_scheduler: lr = 1.0 - max(0, epoch - niter) / float(niter_decay + 1)
-- This is a common learning rate schedule for training GANs. It starts with a high learning rate to quickly converge, then decays it to fine-tune the model. The decay to 0 at the end of training helps stabilize the model.  This schedule helps the model initially converge fast, then gradually fine-tune to reach its optimal performance.
+- This is a common learning rate schedule for training GANs. It starts with a high learning rate to quickly converge, then decays it to fine-tune the model. The decay to 0 at the end of training helps stabilize the model. This schedule helps the model initially converge fast, then gradually fine-tune to reach its optimal performance.
 - Keeps the learning rate at 1.0 for the first niter epochs.
 - Then decays the learning rate linearly to 0 over the next niter_decay epochs.
 
 * optimizers: adam
+- This is a common optimizer
 
 * gan_mode = lsgan
 - The gan_mode parameter specifies the type of GAN objective used in the model. It can take the following values:
