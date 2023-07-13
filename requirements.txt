@@ -8,3 +8,4 @@ lmdb
 tqdm
 skimage
 visdom
+pytorch-msssim
