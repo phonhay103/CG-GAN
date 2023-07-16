@@ -83,8 +83,8 @@ def createDataset(outputPath, imagePathList, labelList, writerIDList, lexiconLis
     writeCache(env, cache)
     print('Created dataset with %d samples' % nSamples)
 
-PATH = 'NomScript/all_images'
-LABEL_PATH = 'NomScript/all_images.txt'
+PATH = 'NomOCR/all_images'
+LABEL_PATH = 'NomOCR/all_images.txt'
 OUTPUT_PATH = 'data/datasets/NOM_train'
 
 if __name__ == '__main__':
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     with open(dictionary_dir) as f:
         radical_data = f.read().splitlines()
 
-    with open('NomScript/unicode_to_nom_dict.json') as f:
+    with open('NomOCR/unicode_to_nom_dict.json') as f:
         unicode_to_json_dict = json.load(f)
     
     nom_to_radical_dict = dict()
