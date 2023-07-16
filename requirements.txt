@@ -8,4 +8,5 @@ lmdb
 tqdm
 skimage
 visdom
-pytorch-msssim
+torchmetrics
+torch-fidelity
