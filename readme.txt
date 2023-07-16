@@ -5,13 +5,16 @@
     - LABEL_PATH: path to all labels file .txt
     - OUTPUT_PATH: path to store lmdb dataset
 
-# Metrics
 
+# pytorch_fid
 python -m pytorch_fid ../VALID valid_stats --device cuda:2 --batch-size 100 --num-workers 20 --save-stats
 python -m pytorch_fid ../TEST test_stats --device cuda:2 --batch-size 100 --num-workers 20 --save-stats
 
-python -m pytorch_fid full_img_stats.npz ../GAN/GAN_47_F --device cuda:2 --batch-size 100 --num-workers 20
-
+# filter
+- ssim
+- psnr
+- lpips
+- fid (draft)
 
 * NOM_IDS_dictionary.txt
     https://hvdic.thivien.net/whv/%E7%B9%A3

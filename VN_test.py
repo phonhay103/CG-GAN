@@ -64,40 +64,39 @@ def main():
         corpus = f.read().splitlines()
 
     model = create_model(opt)
-
     threshold = 250
-    for i in range(10, 46):
+
+    try:
+        opt.epoch = 45
+        model.setup(opt)
+        model.eval()
+    except:
+        print(f'model {opt.epoch} is invalid')
+        return
+
+    for word in tqdm(corpus):
+        img_content = draw(opt.ttfRoot, word)
+        # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
+        img_content = transform_img(img_content)
+        img_content = img_content.unsqueeze(0)
+        data = {'A': img_content, 'B': img_content}
+        model.set_single_input(data)
+        model.test()
+        visuals = model.get_current_visuals()
+        img = list(visuals.items())[0][1]
+        img = util.tensor2im(img)
+
         try:
-            opt.epoch = i
-            model.setup(opt)
-            model.eval()
+            first_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][0] + 1
+            last_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][-1] + 1
+            img = img[:, first_idx:last_idx, :]
+            img = Image.fromarray(img)
         except:
-            print(f'model {i} is invalid')
             continue
 
-        for word in tqdm(corpus):
-            img_content = draw(opt.ttfRoot, word)
-            # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
-            img_content = transform_img(img_content)
-            img_content = img_content.unsqueeze(0)
-            data = {'A': img_content, 'B': img_content}
-            model.set_single_input(data)
-            model.test()
-            visuals = model.get_current_visuals()
-            img = list(visuals.items())[0][1]
-            img = util.tensor2im(img)
-
-            try:
-                first_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][0] + 1
-                last_idx = np.where(np.all(img[:, :, 0] < threshold, axis=0))[0][-1] + 1
-                img = img[:, first_idx:last_idx, :]
-                img = Image.fromarray(img)
-            except:
-                continue
-
-            random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-            filename = f"epoch_{i}_{word}_{random_chars}.png"
-            img.save(os.path.join(save_dir, filename))
+        random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
+        filename = f"epoch_{opt.epoch}_{word}_{random_chars}.png"
+        img.save(os.path.join(save_dir, filename))
 
 if __name__ == '__main__':
     main()

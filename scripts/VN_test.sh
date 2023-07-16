@@ -1,7 +1,7 @@
 python VN_test.py \
 --dataroot data/datasets/VN_train \
 --ttfRoot data/fonts/VN/arial.ttf \
---corpusRoot data/texts/CGGANv2.2_part2.txt \
+--corpusRoot /mnt/disk3/vietocr/datasets/labels/47_words.txt \
 --name VN_handwriting_arial \
 --model handwritten \
 --imgH 64 \

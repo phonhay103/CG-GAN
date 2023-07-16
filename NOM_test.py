@@ -63,38 +63,36 @@ def main():
     with open(opt.corpusRoot) as f:
         corpus = f.read().splitlines()
     
-    with open('NomScript/nom_to_unicode_dict.json') as f:
+    with open('NomOCR/nom_to_unicode_dict.json') as f:
         nom_to_unicode_dict = json.load(f)
 
     model = create_model(opt)
 
-    for i in range(1, 46):
-    # for i in range(4, 10):
-        try:
-            opt.epoch = i
-            model.setup(opt)
-            model.eval()
-        except:
-            print(f'model {i} is invalid')
-            continue
+    try:
+        opt.epoch = 45
+        model.setup(opt)
+        model.eval()
+    except:
+        print(f'model {opt.epoch} is invalid')
+        return
 
-        for word in tqdm(corpus):
-            img_content = draw(opt.ttfRoot, word)
-            unicode_word = nom_to_unicode_dict[word]
-            # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
-            img_content = transform_img(img_content)
-            img_content = img_content.unsqueeze(0)
-            data = {'A': img_content, 'B': img_content}
-            model.set_single_input(data)
-            model.test()
-            visuals = model.get_current_visuals()
-            img = list(visuals.items())[0][1]
-            img = util.tensor2im(img)
-            img = Image.fromarray(img)
+    for word in tqdm(corpus):
+        img_content = draw(opt.ttfRoot, word)
+        unicode_word = nom_to_unicode_dict[word]
+        # img_content.save(os.path.join(save_dir, f"{word}_print.png"))
+        img_content = transform_img(img_content)
+        img_content = img_content.unsqueeze(0)
+        data = {'A': img_content, 'B': img_content}
+        model.set_single_input(data)
+        model.test()
+        visuals = model.get_current_visuals()
+        img = list(visuals.items())[0][1]
+        img = util.tensor2im(img)
+        img = Image.fromarray(img)
 
-            random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
-            filename = f"epoch_{i}_{word}_{unicode_word}_{random_chars}.png"
-            img.save(os.path.join(save_dir, filename))
+        random_chars = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=3))
+        filename = f"epoch_{opt.epoch}_{word}_{unicode_word}_{random_chars}.png"
+        img.save(os.path.join(save_dir, filename))
 
 if __name__ == '__main__':
     main()
