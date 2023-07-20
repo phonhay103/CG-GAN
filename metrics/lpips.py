@@ -22,7 +22,7 @@ class ImagePathDataset(torch.utils.data.Dataset):
 
 batch_size = 1000
 num_workers = 10
-device = torch.device('cuda:1')
+device = torch.device('cuda:2')
 transform = TF.Compose([
     TF.Resize((32, 96)),
     TF.ToTensor(),
@@ -42,6 +42,8 @@ real_loader = torch.utils.data.DataLoader(real_dataset,
     pin_memory=True,
     persistent_workers=True,
 )
+num_images = len(real_dataset)
+print('num_images', num_images)
 
 gan_path = pathlib.Path('/mnt/disk3/GAN/GAN_183_NF')
 gan_files = sorted([file for ext in IMAGE_EXTENSIONS
@@ -71,17 +73,15 @@ for filename, gan_image in tqdm(gan_loader):
     
     lpips_value = torch.empty(0).to(device)
     for _, real_images in real_loader:
+        gan_image = gan_image.to(device)
         real_images = real_images.to(device)
-        if len(real_images) < batch_size:
-            gan_image = gan_image.repeat(len(real_images), 1, 1, 1).to(device)
-        else:
-            gan_image = gan_image.repeat(batch_size, 1, 1, 1).to(device)
 
         _lpips = lpips(gan_image, real_images).detach()
         _lpips = _lpips.unsqueeze(0)
         lpips_value = torch.cat((lpips_value, _lpips))
 
-    lpips_value = lpips_value.mean().cpu().numpy()
+    lpips_value = lpips_value.sum() / num_images
+    lpips_value = lpips_value.cpu().numpy()
     lpips_metric.append(f'{filename}\t{lpips_value}')
 
     if len(lpips_metric) % 30 == 0:

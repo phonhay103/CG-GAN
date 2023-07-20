@@ -8,34 +8,9 @@
 
 ===== pytorch_fid =====
 python -m pytorch_fid ../VALID valid_stats --device cuda:1 --batch-size 100 --num-workers 20 --save-stats
-python -m pytorch_fid valid_stats.npz /mnt/disk3/GAN/GAN_47_NF --device cuda:1 --batch-size 100 --num-workers 20
-python -m pytorch_fid valid_stats.npz /mnt/disk3/GAN/GAN_84_NF --device cuda:1 --batch-size 100 --num-workers 20
+python -m pytorch_fid valid_stats.npz results/NOM_handwriting/TEMP --device cuda:1 --batch-size 100 --num-workers 20
 python -m pytorch_fid valid_stats.npz /mnt/disk3/GAN/GAN_183_NF --device cuda:1 --batch-size 100 --num-workers 20
-
-=> Cần bộ dataset GAN lớn để có kết quả chính xác hơn (xấp xỉ hoặc lớn hơn tập valid)
 ========================
-
-===== filter =====
-- SSIM
-    SSIM của 1 ảnh: Trung bình SSIM của ảnh đó với từng ảnh trong valid
-    Chọn ra những ảnh có SSIM cao nhất
-    => Phù hợp với dataset GAN lớn
-    => Không ổn định
-    => Tính toán chậm
-- PSNR
-    PSNR của 1 ảnh: Trung bình PSNR của ảnh đó với từng ảnh trong valid
-    Chọn ra những ảnh có PSNR cao nhất
-    => Phù hợp với dataset GAN lớn
-    => Không ổn định
-    => Tính toán rất nhanh
-- LPIPS
-    LPIPS của 1 ảnh: Trung bình LPIPS của ảnh đó với từng ảnh trong valid
-    Chọn ra những ảnh có LPIPS thấp nhất
-    => Chưa thử
-    => Tính toán chậm
-=> Với dataset nhỏ, kiểm tra thủ công là phương pháp hợp lý
-
-==================
 
 * NOM_IDS_dictionary.txt
     https://hvdic.thivien.net/whv/%E7%B9%A3
